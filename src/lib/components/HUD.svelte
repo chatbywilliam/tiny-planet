@@ -31,6 +31,7 @@
       <span class="value">{gameState.score}</span>
     </div>
   </div>
+  <div class="version-tag">🚀 auto-deploy test • {new Date().toISOString()}</div>
 </div>
 
 <style>
@@ -75,5 +76,13 @@
     height: 100%;
     border-radius: 5px;
     transition: width 0.3s ease;
+  }
+  .version-tag {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 0.65rem;
+    color: #666666;
+    pointer-events: auto;
   }
 </style>
