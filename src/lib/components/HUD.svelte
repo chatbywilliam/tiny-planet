@@ -44,7 +44,9 @@
     right: 0;
     padding: 12px 16px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     pointer-events: none;
     z-index: 10;
   }
