@@ -32,7 +32,7 @@
     </div>
     <div class="hud-item">
       <span class="label">⚡ FPS</span>
-      <span class="value">{gameState.fps || '...'}</span>
+      <span class="value fps-value">{gameState.fps || '...'}</span>
     </div>
   </div>
 </div>
@@ -68,6 +68,10 @@
     font-variant-numeric: tabular-nums;
   }
   .value.gold { color: #ffd700; }
+  .fps-value {
+    font-size: 1.8rem;
+    color: #44ff44;
+  }
   .bar-bg {
     width: 120px;
     height: 10px;
