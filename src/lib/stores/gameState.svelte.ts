@@ -9,6 +9,7 @@ function createGameState() {
   let selectedTowerDefId: string | null = $state(null);
   let isGameOver = $state(false);
   let isVictory = $state(false);
+  let fps = $state(0);
 
   return {
     get health() { return health; },
@@ -21,7 +22,8 @@ function createGameState() {
     get selectedTowerDefId() { return selectedTowerDefId; },
     get isGameOver() { return isGameOver; },
     get isVictory() { return isVictory; },
-    fps: 0,
+    get fps() { return fps; },
+    set fps(v: number) { fps = v; },
 
     startGame() {
       health = 20;
@@ -34,6 +36,7 @@ function createGameState() {
       isVictory = false;
       isPlacing = false;
       selectedTowerDefId = null;
+      fps = 0;
     },
 
     takeDamage(amount: number) {
@@ -87,6 +90,7 @@ function createGameState() {
       isVictory = false;
       isPlacing = false;
       selectedTowerDefId = null;
+      fps = 0;
     },
   };
 }
