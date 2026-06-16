@@ -46,11 +46,11 @@ export class Tower {
     this.mesh.setRotationFromQuaternion(quat);
     this.mesh.position.copy(surfacePoint.clone().normalize().multiplyScalar(PLANET_RADIUS));
 
-    const ringGeo = new THREE.TorusGeometry(this.def.range * PLANET_RADIUS, 0.03, 16, 32);
+    const ringGeo = new THREE.TorusGeometry(0.4, 0.03, 16, 16);
     const ringMat = new THREE.MeshBasicMaterial({
       color: this.def.color,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.6,
     });
     this.rangeRing = new THREE.Mesh(ringGeo, ringMat);
     this.rangeRing.position.copy(this.mesh.position);
@@ -64,21 +64,13 @@ export class Tower {
 
     for (const enemy of enemies) {
       if (!enemy.alive) continue;
-      const dist = this.greatCircleDistance(enemy.getPosition());
-      const maxRange = this.def.range * PLANET_RADIUS;
-      if (dist <= maxRange && dist < closestDist) {
+      const dist = this.mesh.position.distanceTo(enemy.getPosition());
+      if (dist <= this.def.range && dist < closestDist) {
         closestDist = dist;
         closest = enemy;
       }
     }
     return closest;
-  }
-
-  private greatCircleDistance(other: THREE.Vector3): number {
-    const a = this.mesh.position.clone().normalize();
-    const b = other.clone().normalize();
-    const dot = THREE.MathUtils.clamp(a.dot(b), -1, 1);
-    return Math.acos(dot) * PLANET_RADIUS;
   }
 
   canFire(now: number): boolean {

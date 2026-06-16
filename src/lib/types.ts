@@ -75,7 +75,7 @@ export const TOWER_DEFS: Record<string, TowerDef> = {
     name: 'Archer',
     cost: 50,
     damage: 10,
-    range: 0.6,
+    range: 12,          // 3D world units — covers a good zone in space
     fireRate: 1.5,
     color: 0x44aa44,
   },
@@ -86,7 +86,7 @@ export const ENEMY_DEFS: Record<string, EnemyDef> = {
     id: 'meteor',
     name: 'Meteor',
     hp: 100,
-    speed: 0.08,
+    speed: 3.5,         // units/sec in 3D space (25→5 = 20 units, ~5.7s to reach)
     damage: 10,
     color: 0xff4444,
     reward: 25,
@@ -103,4 +103,4 @@ export const WAVES: WaveDef[] = [
 
 export const PLANET_RADIUS = 5;
 export const CORE_RADIUS = 0.3;
-export const SPAWN_RING_COUNT = 8;
+export const SPACE_SPAWN_RADIUS = 25;   // enemies spawn this far from planet center

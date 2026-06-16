@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { PLANET_RADIUS } from '$lib/types';
 import type { Enemy } from './Enemy';
 
 let nextId = 1;
@@ -25,42 +24,39 @@ export class Projectile {
     this.target = target;
     this.speed = speed;
     this.damage = damage;
+    this.startPos = startPos.clone();
 
-    this.startPos = startPos.clone().normalize().multiplyScalar(PLANET_RADIUS + 0.3);
-
-    const geo = new THREE.SphereGeometry(0.08, 8, 8);
+    const geo = new THREE.SphereGeometry(0.1, 6, 6);
     const mat = new THREE.MeshLambertMaterial({
       color,
       emissive: color,
-      emissiveIntensity: 0.8,
+      emissiveIntensity: 0.9,
     });
     this.mesh = new THREE.Mesh(geo, mat);
     this.mesh.position.copy(this.startPos);
   }
 
+  /** Fly straight toward target in 3D space. Returns false when dead. */
   update(dt: number): boolean {
     if (!this.alive || !this.target.alive) {
       this.alive = false;
       return false;
     }
 
-    this.progress += this.speed * dt;
+    const targetPos = this.target.getPosition();
+    const dist = this.mesh.position.distanceTo(targetPos);
+    const moveStep = this.speed * dt;
 
-    const targetPos = this.target.getPosition().clone()
-      .normalize().multiplyScalar(PLANET_RADIUS + 0.3);
-
-    const t = Math.min(this.progress, 1.0);
-    const interp = new THREE.Vector3().lerpVectors(this.startPos, targetPos, t);
-    const arcHeight = Math.sin(t * Math.PI) * 1.5;
-    interp.normalize().multiplyScalar(PLANET_RADIUS + 0.3 + arcHeight);
-
-    this.mesh.position.copy(interp);
-
-    if (t >= 1.0 || this.mesh.position.distanceTo(targetPos) < 0.4) {
+    if (moveStep >= dist) {
+      // Hit!
       this.target.takeDamage(this.damage);
       this.alive = false;
       return false;
     }
+
+    // Move toward target in straight line
+    const dir = targetPos.clone().sub(this.mesh.position).normalize();
+    this.mesh.position.add(dir.multiplyScalar(moveStep));
 
     return true;
   }

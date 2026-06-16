@@ -2,7 +2,8 @@
   import { gameState } from '$lib/stores/gameState.svelte';
 
   function restart() {
-    gameState.reset();
+    gameState.startGame();
+    window.location.reload();
   }
 </script>
 

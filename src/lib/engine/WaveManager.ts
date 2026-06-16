@@ -36,9 +36,7 @@ export class WaveManager {
       if (entry.spawned >= entry.count) continue;
       entry.spawnTimer -= dt;
       if (entry.spawnTimer <= 0) {
-        const theta = Math.random() * Math.PI * 2;
-        const endTheta = theta + Math.PI;
-        const enemy = new Enemy(entry.defId, theta, endTheta);
+        const enemy = new Enemy(entry.defId);
         toSpawn.push(enemy);
         entry.spawned++;
         entry.spawnTimer = entry.interval;
