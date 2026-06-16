@@ -13,7 +13,6 @@ export class Game {
   constructor(canvas: HTMLCanvasElement) {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x050518);
-    this.scene.fog = new THREE.Fog(0x050518, 20, 60);
 
     this.camera = new THREE.PerspectiveCamera(
       50,
@@ -26,11 +25,14 @@ export class Game {
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
+      antialias: false,
       powerPreference: 'high-performance',
+      alpha: false,
+      stencil: false,
+      depth: true,
     });
     this.renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(1);
 
     const ambient = new THREE.AmbientLight(0x445577, 2.0);
     this.scene.add(ambient);
