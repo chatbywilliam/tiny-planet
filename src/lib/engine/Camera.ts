@@ -10,11 +10,11 @@ export class OrbitCamera {
   private cachedPosition = new THREE.Vector3();
 
   minDistance = 7;
-  maxDistance = 25;
+  maxDistance = 40;
   minPolar = 0.1;
   maxPolar = Math.PI - 0.1;
   rotateSpeed = 0.01;
-  zoomSpeed = 0.15;
+  zoomSpeed = 0.25;
 
   constructor(camera: THREE.PerspectiveCamera, domElement: HTMLElement) {
     this.camera = camera;

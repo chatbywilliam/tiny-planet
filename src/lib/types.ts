@@ -86,7 +86,7 @@ export const ENEMY_DEFS: Record<string, EnemyDef> = {
     id: 'meteor',
     name: 'Meteor',
     hp: 100,
-    speed: 3.5,         // units/sec in 3D space (25→5 = 20 units, ~5.7s to reach)
+    speed: 2.5,         // units/sec — ~12s from spawn to impact (35→5=30 units)
     damage: 10,
     color: 0xff4444,
     reward: 25,
@@ -103,4 +103,4 @@ export const WAVES: WaveDef[] = [
 
 export const PLANET_RADIUS = 5;
 export const CORE_RADIUS = 0.3;
-export const SPACE_SPAWN_RADIUS = 25;   // enemies spawn this far from planet center
+export const SPACE_SPAWN_RADIUS = 35;   // enemies spawn this far from planet center
