@@ -30,10 +30,9 @@
       <span class="label">⭐ Score</span>
       <span class="value">{gameState.score}</span>
     </div>
-    <div class="hud-item">
-      <span class="label">⚡ FPS</span>
-      <span class="value fps-value">{gameState.fps || '...'}</span>
-    </div>
+  </div>
+  <div class="fps-display">
+    ⚡ {gameState.fps || '...'} FPS
   </div>
 </div>
 
@@ -68,9 +67,12 @@
     font-variant-numeric: tabular-nums;
   }
   .value.gold { color: #ffd700; }
-  .fps-value {
-    font-size: 1.8rem;
+  .fps-display {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: bold;
     color: #44ff44;
+    padding: 4px 0 0 0;
   }
   .bar-bg {
     width: 120px;
