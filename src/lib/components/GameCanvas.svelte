@@ -7,7 +7,7 @@
   import { Projectile } from '$lib/engine/Projectile';
   import { WaveManager } from '$lib/engine/WaveManager';
   import { gameState } from '$lib/stores/gameState.svelte';
-  import { ENEMY_DEFS, TOWER_DEFS } from '$lib/types';
+  import { ENEMY_DEFS, TOWER_DEFS, PLANET_RADIUS } from '$lib/types';
   import type { Enemy } from '$lib/engine/Enemy';
 
   let canvasEl: HTMLCanvasElement;
@@ -20,17 +20,94 @@
   let gameTime: number = 0;
   let raycaster = new THREE.Raycaster();
 
+  // Threat dots on planet surface
+  let threatDots: THREE.Mesh[] = [];
+
+  function createThreatDot(): THREE.Mesh {
+    const geo = new THREE.SphereGeometry(0.15, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0xff3333,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const dot = new THREE.Mesh(geo, mat);
+    dot.visible = false;
+    game.scene.add(dot);
+    return dot;
+  }
+
+  function updateThreatDots() {
+    // Ensure we have enough dots
+    while (threatDots.length < enemies.length) {
+      threatDots.push(createThreatDot());
+    }
+
+    const enemyPositions: { x: number; y: number; distance: number }[] = [];
+
+    for (let i = 0; i < enemies.length; i++) {
+      const enemy = enemies[i];
+      if (!enemy.alive) {
+        if (i < threatDots.length) threatDots[i].visible = false;
+        continue;
+      }
+
+      const enemyPos = enemy.getPosition();
+      const distToCenter = enemyPos.length();
+
+      // Project enemy position onto planet surface
+      const surfacePoint = enemyPos.clone().normalize().multiplyScalar(PLANET_RADIUS + 0.15);
+
+      if (i < threatDots.length) {
+        threatDots[i].position.copy(surfacePoint);
+        threatDots[i].visible = true;
+        // Pulse effect based on proximity
+        const proximity = 1 - (distToCenter - PLANET_RADIUS) / 30;
+        (threatDots[i].material as THREE.MeshBasicMaterial).opacity = 0.3 + proximity * 0.7;
+        const scale = 0.6 + proximity * 1.4;
+        threatDots[i].scale.setScalar(scale);
+      }
+
+      // Project to screen space for threat arrows
+      const screenPos = enemyPos.clone().project(game.camera);
+      enemyPositions.push({
+        x: screenPos.x,
+        y: -screenPos.y, // flip Y for CSS
+        distance: Math.max(0, Math.min(1, 1 - (distToCenter - PLANET_RADIUS) / 30)),
+      });
+    }
+
+    // Hide unused dots
+    for (let i = enemies.length; i < threatDots.length; i++) {
+      threatDots[i].visible = false;
+    }
+
+    gameState.enemyScreenPositions = enemyPositions;
+  }
+
   onMount(() => {
     game = new Game(canvasEl);
     planet = new Planet();
     game.scene.add(planet.group);
     waveManager = new WaveManager();
 
-    const wave = waveManager.startNextWave();
-    if (wave) gameState.setWave(wave.waveNumber);
-
     game.onUpdate((dt: number) => {
       if (!gameState.isPlaying) return;
+
+      // Wave prep countdown
+      if (gameState.wavePrep) {
+        gameState.wavePrepTime -= dt;
+        if (gameState.wavePrepTime <= 0) {
+          gameState.wavePrep = false;
+          gameState.wavePrepTime = 0;
+          // Start spawning
+          const wave = waveManager.startNextWave();
+          if (wave) gameState.setWave(wave.waveNumber);
+        }
+        // Still run visual updates during prep
+        updateThreatDots();
+        return;
+      }
+
       gameTime += dt;
       gameState.fps = game.fps;
 
@@ -57,7 +134,7 @@
           const proj = new Projectile(
             tower.getFirePosition(),
             target,
-            3.0,
+            8.0,
             tower.def.damage,
             tower.def.color
           );
@@ -82,7 +159,7 @@
       }
       projectiles = projectiles.filter(p => p.alive);
 
-      // Remove killed enemies from scene
+      // Remove killed enemies
       for (const enemy of enemies) {
         if (!enemy.alive) game.scene.remove(enemy.mesh);
       }
@@ -96,13 +173,21 @@
       }
 
       if (waveManager.waveComplete && !waveManager.allWavesComplete) {
-        const nextWave = waveManager.startNextWave();
-        if (nextWave) gameState.setWave(nextWave.waveNumber);
+        // Start prep for next wave
+        gameState.wavePrep = true;
+        gameState.wavePrepTime = 4.0;
+        gameState.setWave(waveManager.getCurrentWaveNumber());
+
+        // Clear enemy screen positions during prep
+        gameState.enemyScreenPositions = [];
       }
 
-      if (waveManager.allWavesComplete && enemies.length === 0) {
+      if (waveManager.allWavesComplete && enemies.length === 0 && projectiles.length === 0) {
         gameState.endGame(true);
       }
+
+      // Update threat dots
+      updateThreatDots();
     });
 
     // Tower placement via click
@@ -131,8 +216,12 @@
       }
     });
 
+    // Start first wave prep AFTER startGame() to avoid reset
     game.start();
     gameState.startGame();
+    gameState.setWave(waveManager.getCurrentWaveNumber());
+    gameState.wavePrep = true;
+    gameState.wavePrepTime = 4.0;
   });
 </script>
 

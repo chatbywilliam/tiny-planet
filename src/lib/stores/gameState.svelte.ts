@@ -10,6 +10,9 @@ function createGameState() {
   let isGameOver = $state(false);
   let isVictory = $state(false);
   let fps = $state(0);
+  let wavePrep = $state(false);
+  let wavePrepTime = $state(0);
+  let enemyScreenPositions: { x: number; y: number; distance: number }[] = $state([]);
 
   return {
     get health() { return health; },
@@ -24,6 +27,12 @@ function createGameState() {
     get isVictory() { return isVictory; },
     get fps() { return fps; },
     set fps(v: number) { fps = v; },
+    get wavePrep() { return wavePrep; },
+    set wavePrep(v: boolean) { wavePrep = v; },
+    get wavePrepTime() { return wavePrepTime; },
+    set wavePrepTime(v: number) { wavePrepTime = v; },
+    get enemyScreenPositions() { return enemyScreenPositions; },
+    set enemyScreenPositions(v: { x: number; y: number; distance: number }[]) { enemyScreenPositions = v; },
 
     startGame() {
       health = 20;
@@ -37,6 +46,9 @@ function createGameState() {
       isPlacing = false;
       selectedTowerDefId = null;
       fps = 0;
+      wavePrep = false;
+      wavePrepTime = 0;
+      enemyScreenPositions = [];
     },
 
     takeDamage(amount: number) {
