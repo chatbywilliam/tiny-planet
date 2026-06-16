@@ -30,9 +30,10 @@
       <span class="label">⭐ Score</span>
       <span class="value">{gameState.score}</span>
     </div>
-  </div>
-  <div class="version-tag">
-    {gameState.fps > 0 ? `⚡ ${gameState.fps} FPS` : '...'}
+    <div class="hud-item">
+      <span class="label">⚡ FPS</span>
+      <span class="value">{gameState.fps || '...'}</span>
+    </div>
   </div>
 </div>
 
