@@ -86,12 +86,4 @@
     border-radius: 5px;
     transition: width 0.3s ease;
   }
-  .version-tag {
-    position: absolute;
-    bottom: 8px;
-    right: 12px;
-    font-size: 0.65rem;
-    color: #666666;
-    pointer-events: auto;
-  }
 </style>
