@@ -32,6 +32,7 @@
     game.onUpdate((dt: number) => {
       if (!gameState.isPlaying) return;
       gameTime += dt;
+      gameState.fps = game.fps;
 
       // Update enemies
       for (const enemy of enemies) {
@@ -142,5 +143,6 @@
     width: 100%;
     height: 100%;
     display: block;
+    touch-action: none;
   }
 </style>

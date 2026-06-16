@@ -21,6 +21,7 @@ function createGameState() {
     get selectedTowerDefId() { return selectedTowerDefId; },
     get isGameOver() { return isGameOver; },
     get isVictory() { return isVictory; },
+    fps: 0,
 
     startGame() {
       health = 20;

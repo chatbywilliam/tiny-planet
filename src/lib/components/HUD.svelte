@@ -31,7 +31,9 @@
       <span class="value">{gameState.score}</span>
     </div>
   </div>
-  <div class="version-tag">🚀 auto-deploy test • {new Date().toISOString()}</div>
+  <div class="version-tag">
+    {gameState.fps > 0 ? `⚡ ${gameState.fps} FPS` : '...'}
+  </div>
 </div>
 
 <style>

@@ -13,8 +13,8 @@ export class OrbitCamera {
   maxDistance = 25;
   minPolar = 0.1;
   maxPolar = Math.PI - 0.1;
-  rotateSpeed = 0.005;
-  zoomSpeed = 0.1;
+  rotateSpeed = 0.01;
+  zoomSpeed = 0.15;
 
   constructor(camera: THREE.PerspectiveCamera, domElement: HTMLElement) {
     this.camera = camera;

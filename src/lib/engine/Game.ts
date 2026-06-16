@@ -9,6 +9,9 @@ export class Game {
   private clock: THREE.Clock;
   private animationId: number = 0;
   private updateCallbacks: Array<(dt: number) => void> = [];
+  private frameCount = 0;
+  private fpsTimer = 0;
+  fps = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     this.scene = new THREE.Scene();
@@ -85,6 +88,16 @@ export class Game {
     const loop = (): void => {
       this.animationId = requestAnimationFrame(loop);
       const dt = Math.min(this.clock.getDelta(), 0.1);
+
+      // FPS tracking
+      this.frameCount++;
+      this.fpsTimer += dt;
+      if (this.fpsTimer >= 1.0) {
+        this.fps = Math.round(this.frameCount / this.fpsTimer);
+        this.frameCount = 0;
+        this.fpsTimer = 0;
+      }
+
       for (const cb of this.updateCallbacks) {
         cb(dt);
       }
