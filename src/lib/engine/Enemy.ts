@@ -41,13 +41,12 @@ export class Enemy {
     this.speed = this.def.speed / Math.PI;
 
     const geo = new THREE.ConeGeometry(0.25, 0.6, 8, 8);
-    const mat = new THREE.MeshStandardMaterial({
+    const mat = new THREE.MeshLambertMaterial({
       color: this.def.color,
       emissive: this.def.color,
       emissiveIntensity: 0.4,
     });
     this.mesh = new THREE.Mesh(geo, mat);
-    this.mesh.castShadow = true;
     this.mesh.position.copy(this.startPoint);
     this.mesh.lookAt(new THREE.Vector3(0, 0, 0));
 

@@ -24,17 +24,19 @@ export class Game {
     this.camera.position.set(8, 5, 12);
     this.camera.lookAt(0, 0, 0);
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    this.renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      powerPreference: 'high-performance',
+    });
     this.renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.shadowMap.enabled = true;
 
-    const ambient = new THREE.AmbientLight(0x334466, 1.5);
+    const ambient = new THREE.AmbientLight(0x445577, 2.0);
     this.scene.add(ambient);
 
-    const sun = new THREE.DirectionalLight(0xffeedd, 3.0);
+    const sun = new THREE.DirectionalLight(0xffeedd, 2.5);
     sun.position.set(15, 20, 10);
-    sun.castShadow = true;
     this.scene.add(sun);
 
     this.createStarfield();

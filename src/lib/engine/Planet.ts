@@ -9,19 +9,15 @@ export class Planet {
   constructor() {
     this.group = new THREE.Group();
 
-    const surfaceGeo = new THREE.SphereGeometry(PLANET_RADIUS, 64, 64);
+    const surfaceGeo = new THREE.SphereGeometry(PLANET_RADIUS, 32, 32);
     const texture = this.generateTexture();
-    const surfaceMat = new THREE.MeshStandardMaterial({
+    const surfaceMat = new THREE.MeshLambertMaterial({
       map: texture,
-      roughness: 0.8,
-      metalness: 0.1,
     });
     this.mesh = new THREE.Mesh(surfaceGeo, surfaceMat);
-    this.mesh.castShadow = true;
-    this.mesh.receiveShadow = true;
     this.group.add(this.mesh);
 
-    const wireGeo = new THREE.SphereGeometry(PLANET_RADIUS + 0.02, 32, 32);
+    const wireGeo = new THREE.SphereGeometry(PLANET_RADIUS + 0.02, 16, 16);
     const wireMat = new THREE.MeshBasicMaterial({
       color: 0x334455,
       wireframe: true,
@@ -30,11 +26,9 @@ export class Planet {
     });
     this.group.add(new THREE.Mesh(wireGeo, wireMat));
 
-    const coreGeo = new THREE.SphereGeometry(CORE_RADIUS, 32, 32);
-    const coreMat = new THREE.MeshStandardMaterial({
+    const coreGeo = new THREE.SphereGeometry(CORE_RADIUS, 16, 16);
+    const coreMat = new THREE.MeshBasicMaterial({
       color: 0x44aaff,
-      emissive: 0x2288cc,
-      emissiveIntensity: 0.8,
     });
     this.core = new THREE.Mesh(coreGeo, coreMat);
     this.group.add(this.core);

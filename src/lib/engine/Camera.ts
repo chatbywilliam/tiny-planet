@@ -7,6 +7,7 @@ export class OrbitCamera {
   private isDragging = false;
   private prevMouse = { x: 0, y: 0 };
   private domElement: HTMLElement;
+  private cachedPosition = new THREE.Vector3();
 
   minDistance = 7;
   maxDistance = 25;
@@ -38,7 +39,7 @@ export class OrbitCamera {
       this.spherical.phi, this.minPolar, this.maxPolar
     );
 
-    const pos = new THREE.Vector3().setFromSpherical(this.spherical).add(this.target);
+    const pos = this.cachedPosition.setFromSpherical(this.spherical).add(this.target);
     this.camera.position.copy(pos);
     this.camera.lookAt(this.target);
   }

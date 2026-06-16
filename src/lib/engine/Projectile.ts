@@ -29,7 +29,7 @@ export class Projectile {
     this.startPos = startPos.clone().normalize().multiplyScalar(PLANET_RADIUS + 0.3);
 
     const geo = new THREE.SphereGeometry(0.08, 8, 8);
-    const mat = new THREE.MeshStandardMaterial({
+    const mat = new THREE.MeshLambertMaterial({
       color,
       emissive: color,
       emissiveIntensity: 0.8,

@@ -23,17 +23,15 @@ export class Tower {
     this.mesh = new THREE.Group();
 
     const baseGeo = new THREE.CylinderGeometry(0.2, 0.3, 0.5, 8);
-    const baseMat = new THREE.MeshStandardMaterial({
+    const baseMat = new THREE.MeshLambertMaterial({
       color: this.def.color,
-      roughness: 0.4,
-      metalness: 0.6,
     });
     const base = new THREE.Mesh(baseGeo, baseMat);
     base.position.y = 0.25;
     this.mesh.add(base);
 
     const topGeo = new THREE.SphereGeometry(0.2, 8, 8);
-    const topMat = new THREE.MeshStandardMaterial({
+    const topMat = new THREE.MeshLambertMaterial({
       color: this.def.color,
       emissive: this.def.color,
       emissiveIntensity: 0.3,
