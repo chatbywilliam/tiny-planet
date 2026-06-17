@@ -85,8 +85,8 @@ export const ENEMY_DEFS: Record<string, EnemyDef> = {
   meteor: {
     id: 'meteor',
     name: 'Meteor',
-    hp: 100,
-    speed: 2.5,         // units/sec — ~12s from spawn to impact (35→5=30 units)
+    hp: 80,
+    speed: 1.5,         // units/sec — ~20s from spawn to impact (35→5=30 units)
     damage: 10,
     color: 0xff4444,
     reward: 25,
@@ -94,11 +94,11 @@ export const ENEMY_DEFS: Record<string, EnemyDef> = {
 };
 
 export const WAVES: WaveDef[] = [
-  { waveNumber: 1, enemies: [{ defId: 'meteor', count: 5, interval: 1.5 }] },
-  { waveNumber: 2, enemies: [{ defId: 'meteor', count: 8, interval: 1.2 }] },
-  { waveNumber: 3, enemies: [{ defId: 'meteor', count: 12, interval: 1.0 }] },
-  { waveNumber: 4, enemies: [{ defId: 'meteor', count: 15, interval: 0.8 }] },
-  { waveNumber: 5, enemies: [{ defId: 'meteor', count: 20, interval: 0.7 }] },
+  { waveNumber: 1, enemies: [{ defId: 'meteor', count: 5, interval: 2.0 }] },
+  { waveNumber: 2, enemies: [{ defId: 'meteor', count: 8, interval: 1.8 }] },
+  { waveNumber: 3, enemies: [{ defId: 'meteor', count: 12, interval: 1.5 }] },
+  { waveNumber: 4, enemies: [{ defId: 'meteor', count: 15, interval: 1.2 }] },
+  { waveNumber: 5, enemies: [{ defId: 'meteor', count: 20, interval: 1.0 }] },
 ];
 
 export const PLANET_RADIUS = 5;
