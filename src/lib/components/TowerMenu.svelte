@@ -25,7 +25,7 @@
             disabled={gameState.gold < tower.cost}
             onclick={() => startBuild(tower.id)}
           >
-            <span class="tower-name">🏰 {tower.name}</span>
+            <span class="tower-name">🚀 {tower.name}</span>
             <span class="tower-cost">🪙{tower.cost}</span>
           </button>
         {/each}

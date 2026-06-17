@@ -22,23 +22,42 @@ export class Tower {
 
     this.mesh = new THREE.Group();
 
-    const baseGeo = new THREE.CylinderGeometry(0.2, 0.3, 0.5, 8);
-    const baseMat = new THREE.MeshLambertMaterial({
-      color: this.def.color,
-    });
-    const base = new THREE.Mesh(baseGeo, baseMat);
-    base.position.y = 0.25;
-    this.mesh.add(base);
-
-    const topGeo = new THREE.SphereGeometry(0.2, 8, 8);
-    const topMat = new THREE.MeshLambertMaterial({
-      color: this.def.color,
-      emissive: this.def.color,
+    const baseMat = new THREE.MeshLambertMaterial({ color: this.def.color });
+    const accentMat = new THREE.MeshLambertMaterial({
+      color: 0x333344,
+      emissive: 0x111122,
       emissiveIntensity: 0.3,
     });
-    const top = new THREE.Mesh(topGeo, topMat);
-    top.position.y = 0.55;
-    this.mesh.add(top);
+
+    // --- Base platform (small disc) ---
+    const baseGeo = new THREE.CylinderGeometry(0.07, 0.09, 0.06, 8);
+    const base = new THREE.Mesh(baseGeo, baseMat);
+    base.position.y = 0.03;
+    this.mesh.add(base);
+
+    // --- Launcher barrel (tilts to aim) ---
+    const barrelGeo = new THREE.CylinderGeometry(0.025, 0.035, 0.2, 8);
+    const barrelMat = new THREE.MeshLambertMaterial({
+      color: 0x555566,
+      emissive: 0x222233,
+      emissiveIntensity: 0.4,
+    });
+    const barrel = new THREE.Mesh(barrelGeo, barrelMat);
+    barrel.position.y = 0.16;
+    this.mesh.add(barrel);
+
+    // --- Support bracket ---
+    const bracketGeo = new THREE.BoxGeometry(0.06, 0.06, 0.06);
+    const bracket = new THREE.Mesh(bracketGeo, accentMat);
+    bracket.position.y = 0.09;
+    this.mesh.add(bracket);
+
+    // --- Exhaust vent glow (on base rear) ---
+    const ventGeo = new THREE.SphereGeometry(0.02, 4, 4);
+    const ventMat = new THREE.MeshBasicMaterial({ color: 0xff6600 });
+    const vent = new THREE.Mesh(ventGeo, ventMat);
+    vent.position.set(0, 0.04, -0.08);
+    this.mesh.add(vent);
 
     const normal = surfacePoint.clone().normalize();
     const up = new THREE.Vector3(0, 1, 0);
@@ -46,7 +65,7 @@ export class Tower {
     this.mesh.setRotationFromQuaternion(quat);
     this.mesh.position.copy(surfacePoint.clone().normalize().multiplyScalar(PLANET_RADIUS));
 
-    const ringGeo = new THREE.TorusGeometry(0.4, 0.03, 16, 16);
+    const ringGeo = new THREE.TorusGeometry(0.15, 0.02, 8, 16);
     const ringMat = new THREE.MeshBasicMaterial({
       color: this.def.color,
       transparent: true,
@@ -96,6 +115,6 @@ export class Tower {
 
   getFirePosition(): THREE.Vector3 {
     return this.mesh.position.clone()
-      .add(this.position.clone().normalize().multiplyScalar(0.7));
+      .add(this.position.clone().normalize().multiplyScalar(0.22));
   }
 }

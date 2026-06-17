@@ -72,23 +72,23 @@ export interface GameUIState {
 export const TOWER_DEFS: Record<string, TowerDef> = {
   archer: {
     id: 'archer',
-    name: 'Archer',
+    name: 'Rocket Launcher',
     cost: 50,
     damage: 10,
     range: 12,          // 3D world units — covers a good zone in space
     fireRate: 1.5,
-    color: 0x44aa44,
+    color: 0xff6644,
   },
 };
 
 export const ENEMY_DEFS: Record<string, EnemyDef> = {
   meteor: {
     id: 'meteor',
-    name: 'Meteor',
+    name: 'Alien Fighter',
     hp: 80,
     speed: 1.5,         // units/sec — ~20s from spawn to impact (35→5=30 units)
     damage: 10,
-    color: 0xff4444,
+    color: 0x00ccff,
     reward: 25,
   },
 };
