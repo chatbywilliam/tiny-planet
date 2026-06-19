@@ -1,98 +1,46 @@
-import * as THREE from 'three';
 import type { TowerDef } from '$lib/types';
-import { TOWER_DEFS, PLANET_RADIUS } from '$lib/types';
+import { TOWER_DEFS, GRID_SIZE } from '$lib/types';
 import type { Enemy } from './Enemy';
 
 let nextId = 1;
 
 export class Tower {
   id: string;
-  mesh: THREE.Group;
-  rangeRing: THREE.Mesh;
   def: TowerDef;
-  position: THREE.Vector3;
-  level: number;
-  private lastFireTime: number = 0;
+  tx: number;
+  ty: number;
+  lastFireTime = 0;
+  hp = 150; // bulwark HP
+  maxHp = 150;
+  alive = true;
 
-  constructor(defId: string, surfacePoint: THREE.Vector3) {
+  constructor(defId: string, tx: number, ty: number) {
     this.def = TOWER_DEFS[defId];
     this.id = `tower_${nextId++}`;
-    this.position = surfacePoint.clone();
-    this.level = 1;
-
-    this.mesh = new THREE.Group();
-
-    const baseMat = new THREE.MeshLambertMaterial({ color: this.def.color });
-    const accentMat = new THREE.MeshLambertMaterial({
-      color: 0x333344,
-      emissive: 0x111122,
-      emissiveIntensity: 0.3,
-    });
-
-    // --- Base platform (small disc) ---
-    const baseGeo = new THREE.CylinderGeometry(0.07, 0.09, 0.06, 8);
-    const base = new THREE.Mesh(baseGeo, baseMat);
-    base.position.y = 0.03;
-    this.mesh.add(base);
-
-    // --- Launcher barrel (tilts to aim) ---
-    const barrelGeo = new THREE.CylinderGeometry(0.025, 0.035, 0.2, 8);
-    const barrelMat = new THREE.MeshLambertMaterial({
-      color: 0x555566,
-      emissive: 0x222233,
-      emissiveIntensity: 0.4,
-    });
-    const barrel = new THREE.Mesh(barrelGeo, barrelMat);
-    barrel.position.y = 0.16;
-    this.mesh.add(barrel);
-
-    // --- Support bracket ---
-    const bracketGeo = new THREE.BoxGeometry(0.06, 0.06, 0.06);
-    const bracket = new THREE.Mesh(bracketGeo, accentMat);
-    bracket.position.y = 0.09;
-    this.mesh.add(bracket);
-
-    // --- Exhaust vent glow (on base rear) ---
-    const ventGeo = new THREE.SphereGeometry(0.02, 4, 4);
-    const ventMat = new THREE.MeshBasicMaterial({ color: 0xff6600 });
-    const vent = new THREE.Mesh(ventGeo, ventMat);
-    vent.position.set(0, 0.04, -0.08);
-    this.mesh.add(vent);
-
-    const normal = surfacePoint.clone().normalize();
-    const up = new THREE.Vector3(0, 1, 0);
-    const quat = new THREE.Quaternion().setFromUnitVectors(up, normal);
-    this.mesh.setRotationFromQuaternion(quat);
-    this.mesh.position.copy(surfacePoint.clone().normalize().multiplyScalar(PLANET_RADIUS));
-
-    const ringGeo = new THREE.TorusGeometry(0.15, 0.02, 8, 16);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: this.def.color,
-      transparent: true,
-      opacity: 0.6,
-    });
-    this.rangeRing = new THREE.Mesh(ringGeo, ringMat);
-    this.rangeRing.position.copy(this.mesh.position);
-    this.rangeRing.setRotationFromQuaternion(quat);
-    this.rangeRing.visible = false;
+    this.tx = tx;
+    this.ty = ty;
   }
 
   findTarget(enemies: Enemy[]): Enemy | null {
+    if (this.def.damage <= 0 || !this.alive) return null;
     let closest: Enemy | null = null;
     let closestDist = Infinity;
 
-    for (const enemy of enemies) {
-      if (!enemy.alive) continue;
-      const dist = this.mesh.position.distanceTo(enemy.getPosition());
-      if (dist <= this.def.range && dist < closestDist) {
-        closestDist = dist;
-        closest = enemy;
+    for (const e of enemies) {
+      if (!e.alive) continue;
+      const dist = Math.abs(e.x - this.tx) + Math.abs(e.y - this.ty);
+      if (dist <= this.def.range && e.progress > closestDist === false) {
+        if (dist < closestDist) {
+          closestDist = dist;
+          closest = e;
+        }
       }
     }
     return closest;
   }
 
   canFire(now: number): boolean {
+    if (this.def.fireRate <= 0) return false;
     return (now - this.lastFireTime) >= (1.0 / this.def.fireRate);
   }
 
@@ -100,21 +48,20 @@ export class Tower {
     this.lastFireTime = now;
   }
 
-  aimAt(target: THREE.Vector3): void {
-    const top = this.mesh.children[1];
-    if (top) top.lookAt(target);
+  takeDamage(amount: number): boolean {
+    this.hp -= amount;
+    if (this.hp <= 0) {
+      this.hp = 0;
+      this.alive = false;
+      return true;
+    }
+    return false;
   }
 
-  showRange(): void {
-    this.rangeRing.visible = true;
-  }
-
-  hideRange(): void {
-    this.rangeRing.visible = false;
-  }
-
-  getFirePosition(): THREE.Vector3 {
-    return this.mesh.position.clone()
-      .add(this.position.clone().normalize().multiplyScalar(0.22));
+  getCenterPixel(tilePx: number): [number, number] {
+    return [
+      (this.tx + 0.5) * tilePx,
+      (this.ty + 0.5) * tilePx,
+    ];
   }
 }

@@ -1,7 +1,11 @@
+import { STARTING_HP, STARTING_GOLD } from '$lib/types';
+
+export const gameState = createGameState();
+
 function createGameState() {
-  let health = $state(20);
-  let maxHealth = $state(20);
-  let gold = $state(150);
+  let health = $state(STARTING_HP);
+  let maxHealth = $state(STARTING_HP);
+  let gold = $state(STARTING_GOLD);
   let wave = $state(0);
   let score = $state(0);
   let isPlaying = $state(false);
@@ -9,10 +13,6 @@ function createGameState() {
   let selectedTowerDefId: string | null = $state(null);
   let isGameOver = $state(false);
   let isVictory = $state(false);
-  let fps = $state(0);
-  let wavePrep = $state(false);
-  let wavePrepTime = $state(0);
-  let enemyScreenPositions: { x: number; y: number; distance: number }[] = $state([]);
 
   return {
     get health() { return health; },
@@ -25,19 +25,17 @@ function createGameState() {
     get selectedTowerDefId() { return selectedTowerDefId; },
     get isGameOver() { return isGameOver; },
     get isVictory() { return isVictory; },
-    get fps() { return fps; },
-    set fps(v: number) { fps = v; },
-    get wavePrep() { return wavePrep; },
-    set wavePrep(v: boolean) { wavePrep = v; },
-    get wavePrepTime() { return wavePrepTime; },
-    set wavePrepTime(v: number) { wavePrepTime = v; },
-    get enemyScreenPositions() { return enemyScreenPositions; },
-    set enemyScreenPositions(v: { x: number; y: number; distance: number }[]) { enemyScreenPositions = v; },
+
+    // Direct sync from engine (called by GameCanvas)
+    syncFromEngine(engineGold: number, engineHp: number) {
+      gold = engineGold;
+      health = engineHp;
+    },
 
     startGame() {
-      health = 20;
-      maxHealth = 20;
-      gold = 150;
+      health = STARTING_HP;
+      maxHealth = STARTING_HP;
+      gold = STARTING_GOLD;
       wave = 1;
       score = 0;
       isPlaying = true;
@@ -45,10 +43,6 @@ function createGameState() {
       isVictory = false;
       isPlacing = false;
       selectedTowerDefId = null;
-      fps = 0;
-      wavePrep = false;
-      wavePrepTime = 0;
-      enemyScreenPositions = [];
     },
 
     takeDamage(amount: number) {
@@ -67,13 +61,8 @@ function createGameState() {
       return false;
     },
 
-    setWave(n: number) {
-      wave = n;
-    },
-
-    addScore(points: number) {
-      score += points;
-    },
+    setWave(n: number) { wave = n; },
+    addScore(points: number) { score += points; },
 
     startPlacing(towerDefId: string) {
       isPlacing = true;
@@ -90,21 +79,5 @@ function createGameState() {
       isGameOver = true;
       isVictory = victory;
     },
-
-    reset() {
-      health = 20;
-      maxHealth = 20;
-      gold = 150;
-      wave = 0;
-      score = 0;
-      isPlaying = false;
-      isGameOver = false;
-      isVictory = false;
-      isPlacing = false;
-      selectedTowerDefId = null;
-      fps = 0;
-    },
   };
 }
-
-export const gameState = createGameState();
