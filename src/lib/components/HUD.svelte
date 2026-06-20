@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/gameState.svelte';
-  import { STARTING_HP } from '$lib/types';
+  import { STARTING_HP, WAVES } from '$lib/types';
 </script>
 
 <div class="hud">
@@ -19,7 +19,7 @@
 
   <div class="stat">
     <span class="label">🌊 Wave</span>
-    <span class="value">{gameState.wave}/5</span>
+    <span class="value">{gameState.wave}/{WAVES.length}</span>
   </div>
 
   <div class="stat">

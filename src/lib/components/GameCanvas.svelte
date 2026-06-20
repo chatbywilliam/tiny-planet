@@ -26,6 +26,12 @@
       gameState.syncFromEngine(game.gold, game.coreHp);
     }, 200);
 
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (!game.isPlaying) return;
+      if (e.key === 'Escape') { game.cancelPlacing(); game.selectedTower = null; }
+    });
+
     game.start();
   });
 </script>

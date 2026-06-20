@@ -9,13 +9,38 @@
       gameRef.current?.startPlacing(defId);
     }
   }
+
+  function upgrade() {
+    if (gameRef.current?.upgradeSelected()) {
+      gameState.syncFromEngine(gameRef.current.gold, gameRef.current.coreHp);
+    }
+  }
+
+  function sell() {
+    gameRef.current?.sellSelected();
+    if (gameRef.current) gameState.syncFromEngine(gameRef.current.gold, gameRef.current.coreHp);
+  }
+
+  let selectedTower = $derived(gameRef.current?.selectedTower ?? null);
+  let upgCost = $derived(selectedTower ? Math.floor(selectedTower.def.upgradeCost * (1 + selectedTower.upgrades * 0.5)) : 0);
 </script>
 
 {#if !gameState.isGameOver}
   <div class="tower-menu">
-    {#if gameState.isPlacing}
+    {#if selectedTower}
+      <div class="tower-info">
+        <span class="info-name">{selectedTower.def.name} Lv.{selectedTower.upgrades + 1}</span>
+        <button class="btn btn-upgrade" disabled={gameState.gold < upgCost} onclick={upgrade}>
+          ⬆ Upgrade 🪙{upgCost}
+        </button>
+        <button class="btn btn-sell" onclick={sell}>
+          ↩ Sell 🪙{Math.floor(selectedTower.def.cost * 0.5)}
+        </button>
+        <button class="btn btn-cancel" onclick={() => { if (gameRef.current) gameRef.current.selectedTower = null; }}>✕</button>
+      </div>
+    {:else if gameState.isPlacing}
       <div class="placement-hint">
-        🎯 Click a clean tile to place <strong>{TOWER_DEFS[gameState.selectedTowerDefId!]?.name}</strong>
+        🎯 Click a clean tile
         <button class="btn btn-cancel" onclick={() => { gameState.cancelPlacing(); gameRef.current?.cancelPlacing(); }}>✕</button>
       </div>
     {:else}
@@ -39,47 +64,46 @@
 <style>
   .tower-menu {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 8px 12px;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
     display: flex;
     justify-content: center;
     z-index: 10;
   }
-  .tower-buttons { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .tower-buttons, .tower-info { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; align-items: center; }
   .btn {
-    padding: 8px 14px;
+    padding: 8px 12px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    background: rgba(10, 10, 30, 0.85);
+    backdrop-filter: blur(12px);
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
     min-height: 44px;
     min-width: 44px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
   }
-  .btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.4);
-  }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-cancel { background: rgba(255, 50, 50, 0.3); border-color: rgba(255, 50, 50, 0.5); }
-  .tower-cost { color: #ffd700; font-size: 0.75rem; }
+  .btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.4); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-cancel { background: rgba(255, 50, 50, 0.25); border-color: rgba(255, 50, 50, 0.4); }
+  .btn-upgrade { background: rgba(68, 200, 100, 0.2); border-color: rgba(68, 200, 100, 0.4); }
+  .btn-sell { background: rgba(255, 170, 50, 0.2); border-color: rgba(255, 170, 50, 0.4); }
+  .tower-cost { color: #ffd700; }
+  .info-name { color: #ffdd44; font-weight: bold; font-size: 0.85rem; min-width: 80px; }
   .placement-hint {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 8px 16px;
-    background: rgba(0, 100, 200, 0.5);
+    background: rgba(0, 100, 200, 0.4);
     border: 1px solid rgba(100, 180, 255, 0.5);
-    border-radius: 8px;
+    border-radius: 10px;
     color: #cceeff;
-    backdrop-filter: blur(8px);
-    font-size: 0.85rem;
+    backdrop-filter: blur(12px);
   }
 </style>
