@@ -10,6 +10,13 @@ interface Particle {
   life: number; maxLife: number; color: string; size: number;
 }
 
+// ─── Projectile ───────────────────────────────
+interface Projectile {
+  x: number; y: number; tx: number; ty: number;
+  speed: number; damage: number; color: string;
+  target: Enemy;
+}
+
 // ─── FloatingText ─────────────────────────────
 interface FloatText {
   x: number; y: number; text: string; life: number; color: string;
@@ -30,6 +37,7 @@ export class Game {
 
   // Particles & effects
   private particles: Particle[] = [];
+  private projectiles: Projectile[] = [];
   private floatTexts: FloatText[] = [];
   private screenShake = 0;
 
@@ -209,30 +217,49 @@ export class Game {
         if (target && tower.canFire(this.gameTime)) {
           tower.fire(this.gameTime);
           const dmg = tower.def.damage * (1 + tower.upgrades * (tower.def.upgradeMult - 1));
-          const killed = target.takeDamage(dmg);
-          // Muzzle flash
           const [px, py] = tower.getCenterPixel(this.tileSize, this.ox, this.oy);
+          // Spawn projectile — damage delayed until it reaches target
+          this.projectiles.push({ x: px, y: py, tx: 0, ty: 0, speed: 400, damage: dmg, color: tower.def.color, target });
+          // Muzzle flash
           this.spawnParticles(px, py, tower.def.color, 3, 30);
-          // Damage float
-          if (killed) {
-            this.gold += target.def.reward;
-            this.onEnemyKilled?.(target.def.reward);
-            const [ex, ey] = target.getPixelPos(this.tileSize, this.ox, this.oy);
-            this.floatTexts.push({ x: ex, y: ey, text: `+${target.def.reward}🪙`, life: 1.5, color: '#ffd700' });
-            // Death particles
-            this.spawnParticles(ex, ey, target.def.color, 6, 60);
-            const [tx, ty] = target.getTilePos();
-            this.tileMap.cleanse(tx, ty);
-            if (target.def.corruptsAdjacent) {
-              this.tileMap.corruptArea(tx, ty, 2);
-              this.spawnParticles(ex, ey, '#ff0044', 15, 100);
-            }
-          }
         }
       }
     }
     this.enemies = this.enemies.filter(e => e.alive);
     this.towers = this.towers.filter(t => t.alive);
+
+    // Update projectiles
+    for (const proj of this.projectiles) {
+      if (!proj.target.alive) continue;
+      const [etx, ety] = proj.target.getPixelPos(this.tileSize, this.ox, this.oy);
+      proj.tx = etx; proj.ty = ety;
+      const dx = proj.tx - proj.x;
+      const dy = proj.ty - proj.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 5) {
+        // Hit!
+        const killed = proj.target.takeDamage(proj.damage);
+        this.spawnParticles(proj.x, proj.y, proj.color, 3, 20);
+        if (killed) {
+          this.gold += proj.target.def.reward;
+          this.onEnemyKilled?.(proj.target.def.reward);
+          this.floatTexts.push({ x: proj.x, y: proj.y, text: `+${proj.target.def.reward}🪙`, life: 1.5, color: '#ffd700' });
+          this.spawnParticles(proj.x, proj.y, proj.target.def.color, 6, 60);
+          const [tex, tey] = proj.target.getTilePos();
+          this.tileMap.cleanse(tex, tey);
+          if (proj.target.def.corruptsAdjacent) {
+            this.tileMap.corruptArea(tex, tey, 2);
+            this.spawnParticles(proj.x, proj.y, '#ff0044', 15, 100);
+          }
+        }
+        proj.target = null!; // mark for removal
+      } else {
+        const step = (proj.speed * 1/60) / dist;
+        proj.x += dx * Math.min(step, 1);
+        proj.y += dy * Math.min(step, 1);
+      }
+    }
+    this.projectiles = this.projectiles.filter(p => p.target && p.target.alive);
 
     // Wave manager
     const newEnemies = this.waveManager.update(dt, this.enemies);
@@ -663,6 +690,25 @@ export class Game {
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+
+    // ── Projectiles ───────────────────────────
+    for (const proj of this.projectiles) {
+      if (!proj.target?.alive) continue;
+      ctx.strokeStyle = proj.color;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = proj.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.moveTo(proj.x, proj.y);
+      ctx.lineTo(proj.tx, proj.ty);
+      ctx.stroke();
+      // Glowing dot at head
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(proj.x, proj.y, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
 
     // ── Float texts ──────────────────────────
     for (const ft of this.floatTexts) {

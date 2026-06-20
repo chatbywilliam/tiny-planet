@@ -63,7 +63,7 @@
 
 <style>
   .tower-menu {
-    position: absolute;
+    position: fixed;
     bottom: 8px;
     left: 8px;
     right: 8px;

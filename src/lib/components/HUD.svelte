@@ -30,7 +30,7 @@
 
 <style>
   .hud {
-    position: absolute;
+    position: fixed;
     top: 8px;
     left: 8px;
     right: 8px;

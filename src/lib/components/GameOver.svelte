@@ -23,7 +23,7 @@
 
 <style>
   .overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.85);
     display: flex;
