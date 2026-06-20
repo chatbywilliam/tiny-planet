@@ -295,7 +295,7 @@ export class Game {
       this.gold -= def.cost;
       const tower = new Tower(this.selectedTowerId, tx, ty);
       this.towers.push(tower);
-      this.cancelPlacing();
+      // Stay in placement mode — player can keep placing same tower type
       return;
     }
 
